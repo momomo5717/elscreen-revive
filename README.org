@@ -1,0 +1,143 @@
+#+title:elscreen-revive.el
+#+OPTIONS: author:nil timestamp:nil  num:nil creator:nil
+
+* What is it?
+
+  The elscreen-revive is to restore elscreen tabs to each frames using revive.el.
+
+  This can enable you to easily write a wrapper function to store or restore elscreent tabs.
+
+  This was tested on GNU Emacs 24.4 (emacs-mac-app 5.2_0 installed by MacPorts).
+
+* Requirement
+
+  cl-lib.el   : builtin package 
+
+  elscreen.el : [[https://github.com/knu/elscreen]]
+
+  revive.el   : http://www.gentei.org/~yuuji/software/revive.el
+  
+  You can also install those from elpa, el-get or other package systems.
+
+* Installation
+
+  git clone https://github.com/momomo5717/elscreen-revive
+
+* Setup
+
+#+BEGIN_SRC elisp
+(add-to-list 'load-path "~/.emacs.d/your installed directory/elscreen-revive")
+(elscreen-start)
+(require 'elscreen-revive)
+(elsc-r:add-kill-emacs-hook)
+#+END_SRC
+  
+* Usage
+** Basic usage
+
+*** Store elscreen tabs
+    
+    M-x elsc-r:store
+
+    If you do not want to store the session end,
+
+    M-x elsc-r:remove-kill-emacs-hook
+
+*** Restore elscrenn tabs
+
+    M-x elsc-r:restore
+
+    or 
+
+    M-x elsc-r:restore-to-new-frame
+
+    If run save-current-configuration written in revive.el, you can use 
+
+    M-x elsc-r:resume-and-restore
+
+    If you use elsc-r:resume-and-restore at the next session, add the following to your init file.
+
+#+BEGIN_SRC elisp
+(add-hook 'kill-emacs-hook 'save-current-configuration 'append)
+#+END_SRC
+
+** Store automatically at the session start.
+
+#+BEGIN_SRC elisp
+(add-hook 'after-init-hook 'elsc-r:restore)
+#+END_SRC
+    or 
+#+BEGIN_SRC elisp
+(add-hook 'after-init-hook 'elsc-r:resume-and-restore)
+(add-hook 'kill-emacs-hook 'save-current-configuration 'append)
+#+END_SRC
+
+** Custom Variables
+
+**** elsc-r:config-file
+
+     Default : (locate-user-emacs-file ".elscreen-revive")
+
+     Stored file path. 
+
+**** elsc-r:store-frame-keys 
+
+     Default : t
+      
+     Stored frame key list or t.
+
+     If you want to store just frame position parameters,
+
+     (setq elsc-r:store-frame-keys '(top left))
+
+**** elsc-r:max-frame-num 
+
+     Default : 5
+      
+     This is to avoid making too many frames. 
+
+** Sample Wrapper Functions
+
+    If you want to store and restore temporarily, you can write the following in your init file.
+    
+    #+BEGIN_SRC elisp
+(defvar elsc-r:tmp-config-file (make-temp-file ".elscreen-revive.tmp"))
+
+(defun elsc-r:store-tmp ()
+  "Store elscreen tabs to tmp file."
+  (interactive)
+  (elsc-r:write-frame-configs elsc-r:tmp-config-file))
+
+(defun elsc-r:restore-tmp ()
+  "Restore elscreen tabs from tmp file."  
+  (interactive)
+  (elsc-r:restore-file elsc-r:tmp-config-file))
+
+(defun elsc-r:restore-tmp-to-new-frame ()
+  "Restore elscreen tabs from tmp file to new frames."    
+  (interactive)
+  (elsc-r:restore-file elsc-r:tmp-config-file t))
+
+(define-key elscreen-map (kbd "M-s") 'elsc-r:store-tmp)
+(define-key elscreen-map (kbd "M-r") 'elsc-r:restore-tmp)
+(define-key elscreen-map (kbd "M-R") 'elsc-r:restore-tmp-to-new-frame)
+    #+END_SRC
+
+* Background
+
+    This was inspired by 
+
+    [[http://stackoverflow.com/questions/22445670/save-and-restore-elscreen-tabs-and-split-frames]]
+    [[https://github.com/robario/elscreen-persist]]
+
+
+
+    I'm new to Github and learn programming as a hobby. I will learn more about that and English.
+
+    Thank you for your help and advice.
+    
+
+    このプログラムは stackoverflow の投稿を参考にして，適当に自分の初期ファイルに書いていたものです．
+    最近 elscreen-persist を知り，参考にさせていただき，パッケージとしてまとめました．
+
+    趣味でプログラミングを学んでいるため，稚拙なところが多々あると思います．アドバイスなど頂けると幸いです．
