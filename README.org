@@ -3,7 +3,7 @@
 
 * What is it?
 
-  The elscreen-revive is to restore elscreen tabs to each frames using revive.el.
+  The elscreen-revive is to restore elscreen tabs to each frames using revive.el and revivel+.el.
 
   This can enable you to easily write a wrapper function to store or restore elscreent tabs.
 
@@ -16,6 +16,8 @@
   elscreen.el : [[https://github.com/knu/elscreen]]
 
   revive.el   : http://www.gentei.org/~yuuji/software/revive.el
+
+  revive+.el  : [[https://github.com/martialboniou/revive-plus]]
   
   You can also install those from elpa, el-get or other package systems.
 
@@ -129,7 +131,6 @@
 
     [[http://stackoverflow.com/questions/22445670/save-and-restore-elscreen-tabs-and-split-frames]]
     [[https://github.com/robario/elscreen-persist]]
-
 
 
     I'm new to Github and learn programming as a hobby. I will learn more about that and English.

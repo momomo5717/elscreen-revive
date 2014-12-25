@@ -1,10 +1,10 @@
-;;; elscreen-revive.el --- srestore elscreen tabs to each frames using revive.el
+;;; elscreen-revive.el --- srestore elscreen tabs to each frames using revive.el and revive+.el
 
 ;; Copyright (C) 2014 momomo5717 <momomosute_at_gmail.com>
 
-;; Keywords: elscreen revive
+;; Keywords: elscreen revive revive-plus
 ;; Version: 0.1
-;; Package-Requires: ((emacs "24") (cl-lib "1.0") (elscreen "20140421.414") (revive "2.22"))
+;; Package-Requires: ((emacs "24") (cl-lib "1.0") (elscreen "20140421.414") (revive "2.22") (revive-plus "0.9"))
 ;; URL: https://github.com/momomo5717/elscreen-revive
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -68,6 +68,7 @@
 
 (require 'cl-lib)
 (require 'revive)
+(require 'revive+)
 (require 'elscreen)
 
 (defgroup elscreen-revive nil
@@ -77,7 +78,7 @@
 
 (defconst elscreen-revive-version "0.1.0")
 
-;; Coustom Variables
+;; Custom Variables
 
 (defcustom elsc-r:config-file
   (locate-user-emacs-file ".elscreen-revive")
@@ -116,7 +117,7 @@ Store particular frame parameters without buffer, if key list.
 ;;   screen-config  = (list (screen-num window-config focus) ...)
 ;;   frame-params   = filtered-frame-parameters
 ;;   screen-num     = 0 | 1 | ... | 9
-;;   window-config  = current-window-configuration-printable from revive.el or revive+.el
+;;   window-config  = current-window-configuration-printable from revive+.el
 ;;   focus          = 'focus | . nil
 
 ;; Functions to Store
