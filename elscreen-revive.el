@@ -1,4 +1,4 @@
-;;; elscreen-revive.el --- srestore elscreen tabs to each frames using revive.el and revive+.el
+;;; elscreen-revive.el --- restore elscreen tabs to each frames using revive.el and revive+.el
 
 ;; Copyright (C) 2014 momomo5717 <momomosute_at_gmail.com>
 
