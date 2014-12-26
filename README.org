@@ -45,7 +45,7 @@
 
     M-x elsc-r:remove-kill-emacs-hook
 
-*** Restore elscrenn tabs
+*** Restore elscren tabs
 
     M-x elsc-r:restore
 
