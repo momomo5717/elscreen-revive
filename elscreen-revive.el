@@ -72,8 +72,8 @@
 (require 'elscreen)
 
 (defgroup elscreen-revive nil
-  "ElScreen Restore -- ElScreen store and restore all frame"
-  :tag "ElScreen Restore"
+  "ElScreen Revive -- Store and Restore ElScreen tabs"
+  :tag "ElScreen Revive"
   :group 'elscreen)
 
 (defconst elscreen-revive-version "0.1.0")
