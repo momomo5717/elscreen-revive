@@ -1,6 +1,8 @@
 #+title:elscreen-revive.el
 #+OPTIONS: author:nil timestamp:nil  num:nil creator:nil
 
+I'm new to git and github. I've been learning. So, this repository might be reinitialized on a sudden.
+
 * What is it?
 
   The elscreen-revive is to restore elscreen tabs to each frames using revive.el and revivel+.el.
