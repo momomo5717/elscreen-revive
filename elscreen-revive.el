@@ -139,24 +139,26 @@ Store particular frame parameters without buffer, if key list.
 
 (defun elsc-r:screen-configs ()
   "elscreen-frame-conf -> screen-confs"
-  (save-window-excursion
-    (mapcar (lambda (s-num)
-              (set-window-configuration (car (elscreen-get-window-configuration s-num)))
-              (list s-num (current-window-configuration-printable)))
-            (reverse (elscreen-get-conf-list 'screen-history)))))
+  (save-excursion
+   (save-window-excursion
+     (mapcar (lambda (s-num)
+               (set-window-configuration (car (elscreen-get-window-configuration s-num)))
+               (list s-num (current-window-configuration-printable)))
+             (reverse (elscreen-get-conf-list 'screen-history))))))
 
 (defun elsc-r:frame-configs ()
   "Return frame-confs"
   (let ((now-fr (selected-frame)))
-    (save-window-excursion
-     (prog1
-         (mapcar
-          (lambda(frame-conf) (select-frame (car frame-conf))
-            (list (elsc-r:filtered-frame-parameters (car frame-conf))
-                  (elsc-r:screen-configs)))
-          (cons (cl-find-if (lambda (fr) (eq fr now-fr)) elscreen-frame-confs :key #'car)
-                (cl-remove-if (lambda (fr) (eq fr now-fr)) elscreen-frame-confs :key #'car)))
-       (select-frame now-fr)))))
+    (save-excursion
+     (save-window-excursion
+       (prog1
+           (mapcar
+            (lambda(frame-conf) (select-frame (car frame-conf))
+              (list (elsc-r:filtered-frame-parameters (car frame-conf))
+                    (elsc-r:screen-configs)))
+            (cons (cl-find-if (lambda (fr) (eq fr now-fr)) elscreen-frame-confs :key #'car)
+                  (cl-remove-if (lambda (fr) (eq fr now-fr)) elscreen-frame-confs :key #'car)))
+         (select-frame now-fr))))))
 
 (defun elsc-r:write-frame-configs (file)
   "Write frame-configs to file."
