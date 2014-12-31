@@ -23,6 +23,10 @@ I'm new to git and github. I've been learning. So, this repository might be rein
   
   You can also install those from elpa, el-get or other package systems.
 
+* Installation
+
+  git clone https://github.com/momomo5717/elscreen-revive
+
 * Setup
 
 #+BEGIN_SRC elisp

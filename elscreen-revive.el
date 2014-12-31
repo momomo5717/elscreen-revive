@@ -149,14 +149,14 @@ Store particular frame parameters without buffer, if key list.
   "Return frame-confs"
   (let ((now-fr (selected-frame)))
     (save-window-excursion
-      (prog1
-          (mapcar
-           (lambda(frame-conf) (select-frame (car frame-conf))
-             (list (elsc-r:filtered-frame-parameters (car frame-conf))
-                   (elsc-r:screen-configs)))
-           (cons (cl-find-if (lambda (fr) (eq fr now-fr)) elscreen-frame-confs :key #'car)
-                 (cl-remove-if (lambda (fr) (eq fr now-fr)) elscreen-frame-confs :key #'car)))
-        (select-frame now-fr)))))
+     (prog1
+         (mapcar
+          (lambda(frame-conf) (select-frame (car frame-conf))
+            (list (elsc-r:filtered-frame-parameters (car frame-conf))
+                  (elsc-r:screen-configs)))
+          (cons (cl-find-if (lambda (fr) (eq fr now-fr)) elscreen-frame-confs :key #'car)
+                (cl-remove-if (lambda (fr) (eq fr now-fr)) elscreen-frame-confs :key #'car)))
+       (select-frame now-fr)))))
 
 (defun elsc-r:write-frame-configs (file)
   "Write frame-configs to file."
