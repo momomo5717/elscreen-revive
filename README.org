@@ -11,7 +11,7 @@ I'm new to git and github. I've been learning. So, this repository might be rein
 
   This was tested on GNU Emacs 24.4 (emacs-mac-app 5.2_0 installed by MacPorts).
 
-* Requirement
+* Requirements
 
   cl-lib.el   : builtin package 
 
@@ -22,10 +22,6 @@ I'm new to git and github. I've been learning. So, this repository might be rein
   revive+.el  : [[https://github.com/martialboniou/revive-plus]]
   
   You can also install those from elpa, el-get or other package systems.
-
-* Installation
-
-  git clone https://github.com/momomo5717/elscreen-revive
 
 * Setup
 
