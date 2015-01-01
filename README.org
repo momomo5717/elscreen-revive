@@ -58,18 +58,13 @@ I'm new to git and github. I've been learning. So, this repository might be rein
     If you use elsc-r:resume-and-restore at the next session, add the following to your init file.
 
 #+BEGIN_SRC elisp
-(add-hook 'kill-emacs-hook 'save-current-configuration 'append)
+(add-hook 'kill-emacs-hook 'save-current-configuration)
 #+END_SRC
 
-** Store automatically at the session start.
+** Restore automatically at the session start.
 
 #+BEGIN_SRC elisp
-(add-hook 'after-init-hook 'elsc-r:restore)
-#+END_SRC
-    or 
-#+BEGIN_SRC elisp
-(add-hook 'after-init-hook 'elsc-r:resume-and-restore)
-(add-hook 'kill-emacs-hook 'save-current-configuration 'append)
+(add-hook 'window-setup-hook 'elsc-r:restore)
 #+END_SRC
 
 ** Custom Variables
