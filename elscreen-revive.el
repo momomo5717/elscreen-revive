@@ -176,18 +176,17 @@ Store particular frame parameters without buffer, if key list.
 
 (defun elsc-r:restore-screen-configs (screen-configs)
   "Restore from (list screen- config ...)"
-  (let ((ls screen-configs) res-ls (c 0))
-    (while (and (not (null ls)) (< c 19))
-      (cl-incf c)
-      (if (elscreen-screen-live-p (cl-first (car ls)))
-          (let* ((s-config     (car ls))
-                 (s-num        (cl-first  s-config))
-                 (s-win-config (cl-second s-config)))
-            (elscreen-goto s-num)
-            (restore-window-configuration s-win-config)
-            (pop ls) (push s-num res-ls))
-        (elscreen-create-internal)))
-    (when (not (null res-ls))
+  (let ((ls screen-configs) res-ls)
+    (cl-loop when (null ls) return nil
+             for s-config = (car ls) for s-num = (car s-config) do
+             (cond
+              ((not (and (integerp s-num) (<= 0 s-num 9))) (pop ls))
+              ((elscreen-screen-live-p s-num)
+               (elscreen-goto s-num)
+               (restore-window-configuration (cl-second s-config))
+               (pop ls) (push s-num res-ls))
+              (t (elscreen-create-internal))))
+    (when res-ls
       (cl-mapc #'elscreen-kill-internal
                (cl-set-difference (elscreen-get-screen-list) res-ls)))))
 
