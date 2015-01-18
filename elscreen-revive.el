@@ -114,10 +114,11 @@ Store particular frame parameters without buffer, if key list.
 ;;   frame-configs  = (list frame-config ...)
 ;;   frame-config   = (list frame-params screen-configs)
 ;;   screen-configs = (list screen-config ...)  in reverse order of screen-history
-;;   screen-config  = (list screen-num window-config)
+;;   screen-config  = (list screen-num window-config nickname)
 ;;   frame-params   = filtered-frame-parameters
-;;   screen-num     = 0 | 1 | ... | 9
+;;   screen-num     = 0 | 1 | ... | n
 ;;   window-config  = current-window-configuration-printable from revive+.el
+;;   nickname       = string | nil
 
 
 ;; Functions to Store
@@ -125,7 +126,7 @@ Store particular frame parameters without buffer, if key list.
 (defun elsc-r:frame-parameters-without-bffer (&optional frame)
   "frame-obj -> frame-params"
   (cl-remove-if
-   (lambda (key) (memq key '(buffer-list buried-buffer-list minibuffer)))
+   (lambda (key) (memq key '(buffer-list buried-buffer-list minibuffer frameset--id)))
    (frame-parameters frame) :key #'car))
 
 (defun elsc-r:filtered-frame-parameters (&optional frame)
@@ -137,28 +138,31 @@ Store particular frame parameters without buffer, if key list.
       (elsc-r:frame-parameters-without-bffer frame) :key #'car))
    (t (elsc-r:frame-parameters-without-bffer frame))))
 
-(defun elsc-r:screen-configs ()
-  "elscreen-frame-conf -> screen-confs"
-  (save-excursion
-   (save-window-excursion
-     (mapcar (lambda (s-num)
-               (set-window-configuration (car (elscreen-get-window-configuration s-num)))
-               (list s-num (current-window-configuration-printable)))
-             (reverse (elscreen-get-conf-list 'screen-history))))))
+(defun elsc-r:screen-configs (frame)
+  "Return screen-confs"
+  (let ((now-fr (selected-frame)))
+    (select-frame frame)
+    (elscreen-set-window-configuration
+     (elscreen-get-current-screen)
+     (elscreen-current-window-configuration))
+    (cl-loop for s-num in (reverse (elscreen-get-conf-list 'screen-history)) do
+             (elscreen-apply-window-configuration
+              (elscreen-get-window-configuration s-num))
+             collect (list s-num
+                           (current-window-configuration-printable)
+                           (elscreen-get-screen-nickname s-num))
+             finally (select-frame now-fr))))
 
 (defun elsc-r:frame-configs ()
   "Return frame-confs"
-  (let ((now-fr (selected-frame)))
-    (save-excursion
-     (save-window-excursion
-       (prog1
-           (mapcar
-            (lambda(frame-conf) (select-frame (car frame-conf))
-              (list (elsc-r:filtered-frame-parameters (car frame-conf))
-                    (elsc-r:screen-configs)))
-            (cons (cl-find-if (lambda (fr) (eq fr now-fr)) elscreen-frame-confs :key #'car)
-                  (cl-remove-if (lambda (fr) (eq fr now-fr)) elscreen-frame-confs :key #'car)))
-         (select-frame now-fr))))))
+  (let ((now-fr (selected-frame))
+        (fr-ls (mapcar #'car elscreen-frame-confs)))
+    (mapcar
+     (lambda(fr)
+       (list (elsc-r:filtered-frame-parameters fr)
+             (elsc-r:screen-configs fr)))
+     (cons (cl-find-if (lambda (fr) (eq fr now-fr)) fr-ls)
+           (cl-remove-if (lambda (fr) (eq fr now-fr)) fr-ls )))))
 
 (defun elsc-r:write-frame-configs (file)
   "Write frame-configs to file."
@@ -176,19 +180,27 @@ Store particular frame parameters without buffer, if key list.
 
 (defun elsc-r:restore-screen-configs (screen-configs)
   "Restore from (list screen- config ...)"
-  (let ((ls screen-configs) res-ls)
+  (let ((ls screen-configs) res-ls current-conf)
+    (setq current-conf (elscreen-current-window-configuration))
     (cl-loop when (null ls) return nil
+             with createdp = t
              for s-config = (car ls) for s-num = (car s-config) do
              (cond
-              ((not (and (integerp s-num) (<= 0 s-num 9))) (pop ls))
+              ((or (not (integerp s-num)) (< s-num 0)) (pop ls))
               ((elscreen-screen-live-p s-num)
                (elscreen-goto s-num)
                (restore-window-configuration (cl-second s-config))
+               (when (stringp (cl-third s-config))
+                 (elscreen-screen-nickname (cl-third s-config)))
                (pop ls) (push s-num res-ls))
-              (t (elscreen-create-internal))))
-    (when res-ls
-      (cl-mapc #'elscreen-kill-internal
-               (cl-set-difference (elscreen-get-screen-list) res-ls)))))
+              ((null createdp) (pop ls))
+              (t (setq createdp (elscreen-create-internal)))))
+    (cl-mapc #'elscreen-kill-internal
+             (cl-set-difference (elscreen-get-screen-list) res-ls))
+    (unless (elscreen-get-screen-list)
+      (elscreen-delete-frame-confs fr)
+      (elscreen-make-frame-confs fr)
+      (elscreen-apply-window-configuration current-conf))))
 
 (defun elsc-r:restore-frame-config (frame-config &optional frame)
   "Restore elscreen tabs from (list frame-params screen-configs) and frame-obj."
@@ -208,7 +220,8 @@ Store particular frame parameters without buffer, if key list.
                    (elsc-r:force-n-frame-list
                     (min (length frame-configs) elsc-r:max-frame-num)))))
      (cl-mapc #'elsc-r:restore-frame-config frame-configs fr-ls)
-     (select-frame-set-input-focus (cl-first fr-ls)))))
+     (select-frame-set-input-focus (cl-first fr-ls))
+     (elscreen-notify-screen-modification 'force-immediately))))
 
 (defun elsc-r:restore-file (file &optional add)
   "Restore elscreen tabs from a config file.
